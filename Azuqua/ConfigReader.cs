@@ -7,6 +7,8 @@
 namespace Azuqua
 {
     using System;
+    using System.Configuration;
+    using System.IO;
 
     /// <summary>
     /// This class is responsible for reading Flo Key and Secret from
@@ -47,8 +49,21 @@ namespace Azuqua
         /// </summary>
         private void LoadConfigurationData()
         {
-            this.Key = System.Environment.GetEnvironmentVariable(FloAccessKeyVariableName);
-            this.Secret = System.Environment.GetEnvironmentVariable(FloAccessSecretVariableName);
+            if (File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) 
+                && ConfigurationManager.AppSettings.Count > 0)
+            {
+                this.Key = ConfigurationManager.AppSettings[FloAccessKeyVariableName];
+                this.Secret = ConfigurationManager.AppSettings[FloAccessSecretVariableName];
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(FloAccessKeyVariableName))
+                    && !string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(FloAccessSecretVariableName)))
+                {
+                    this.Key = System.Environment.GetEnvironmentVariable(FloAccessKeyVariableName);
+                    this.Secret = System.Environment.GetEnvironmentVariable(FloAccessSecretVariableName);
+                }
+            }
         }
     }
 }

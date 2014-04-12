@@ -50,19 +50,23 @@ namespace Azuqua
         private void LoadConfigurationData()
         {
             if (File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) 
-                && ConfigurationManager.AppSettings.Count > 0)
+                && ConfigurationManager.AppSettings.Count > 0
+                && !string.IsNullOrEmpty(ConfigurationManager.AppSettings[FloAccessKeyVariableName])
+                && !string.IsNullOrEmpty(ConfigurationManager.AppSettings[FloAccessSecretVariableName]))
             {
                 this.Key = ConfigurationManager.AppSettings[FloAccessKeyVariableName];
                 this.Secret = ConfigurationManager.AppSettings[FloAccessSecretVariableName];
             }
+            else if (!string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(FloAccessKeyVariableName))
+                    && !string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(FloAccessSecretVariableName)))
+            {
+                this.Key = System.Environment.GetEnvironmentVariable(FloAccessKeyVariableName);
+                this.Secret = System.Environment.GetEnvironmentVariable(FloAccessSecretVariableName);
+            }
             else
             {
-                if (!string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(FloAccessKeyVariableName))
-                    && !string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(FloAccessSecretVariableName)))
-                {
-                    this.Key = System.Environment.GetEnvironmentVariable(FloAccessKeyVariableName);
-                    this.Secret = System.Environment.GetEnvironmentVariable(FloAccessSecretVariableName);
-                }
+                this.Key = string.Empty;
+                this.Secret = string.Empty;
             }
         }
     }

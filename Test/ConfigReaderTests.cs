@@ -84,6 +84,23 @@ namespace Azuqua.Test
             this.RemoveAppSettings();
         }
 
+        [Test]
+        public void ShouldNotUseKeyAndSecretIfOneOfTheConfigSettingsIsMissingOrEmpty()
+        {
+            string key = "aaaaa";
+            string secret = "";
+
+            this.DeleteEnvironmentVariables();
+            this.SetAppSettings(key, secret);
+
+            ConfigReader reader = new ConfigReader();
+
+            Assert.AreEqual(string.Empty, reader.Key);
+            Assert.AreEqual(string.Empty, reader.Secret);
+
+            this.RemoveAppSettings();
+        }
+
         #endregion
 
         #region Have both environment variables and configuration file

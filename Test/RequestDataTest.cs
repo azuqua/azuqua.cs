@@ -7,12 +7,17 @@ using NUnit;
 using NUnit.Framework;
 
 using Azuqua;
+using System.Security.Cryptography;
+using System.Configuration;
 
 namespace Azuqua.Test
 {
     [TestFixture]
     public class RequestDataTest
     {
+        private const string KeyName = "floAccessKey";
+        private const string SecretName = "floAccessSecret";
+
         [Test]
         public void CanCreateWithData()
         {
@@ -20,7 +25,7 @@ namespace Azuqua.Test
 
             RequestData requestData = new RequestData(data);
 
-            Assert.IsNotNull(data);
+            Assert.IsNotNull(requestData);
         }
 
         [Test]
@@ -59,6 +64,156 @@ namespace Azuqua.Test
             Assert.AreEqual(key, requestData.Key);
             Assert.AreEqual(secret, requestData.Secret);
             Assert.AreEqual(data, requestData.Data);
+        }
+
+        [Test]
+        public void ShouldReadKeyAndSecretFromEnvironmentVariables()
+        {
+            string key = "aaa";
+            string secret = "bbb";
+            string data = "ccc";
+
+            SetEnvironmentVariables(key, secret);
+
+            RequestData requestData = new RequestData(data);
+            string hash = this.CreateHash(secret, data);
+
+            Assert.AreEqual(hash, requestData.Hash);
+
+            DeleteEnvironmentVariables();
+        }
+
+        [Test]
+        public void ShouldReadKeyAndSecretFromAppSettings()
+        {
+            string key = "aaa";
+            string secret = "bbb";
+            string data = "ccc";
+
+            DeleteEnvironmentVariables();
+            SetAppSettings(key, secret);
+
+            RequestData requestData = new RequestData(data);
+            string hash = this.CreateHash(secret, data);
+
+            Assert.AreEqual(hash, requestData.Hash);
+
+            RemoveAppSettings();
+        }
+
+        [Test]
+        public void CanReadHashProperty()
+        {
+            string data = "";
+
+            RequestData requestData = new RequestData(data);
+
+            Assert.IsNotNull(requestData.Hash);
+        }
+
+        [Test]
+        public void CannotWriteToHashProperty()
+        {
+            Assert.IsFalse(typeof(RequestData).GetProperty("Hash").CanWrite);
+        }
+
+        [Test]
+        public void ShouldGenerateHashFromData()
+        {
+            string secret = "bbbbb";
+            string data = "ccccc";
+            string hash = string.Empty;
+            RequestData requestData = new RequestData(data);
+            requestData.Secret = secret;
+
+            hash = this.CreateHash(secret, data);
+
+            Assert.AreEqual(hash, requestData.Hash);
+        }
+
+        [Test]
+        public void ShouldGenerateEmptyHashIfDataIsNullOrEmpty()
+        {
+            string data = "";
+
+            RequestData requestData = new RequestData(data);
+
+            Assert.IsTrue(string.IsNullOrEmpty(requestData.Hash));
+        }
+
+        private string CreateHash(string secret, string data)
+        {
+            var encoding = new System.Text.UTF8Encoding();
+            byte[] keyByte = encoding.GetBytes(secret);
+            byte[] messageBytes = encoding.GetBytes(data);
+            string hash = string.Empty;
+
+            using (var hmacsha256 = new HMACSHA256(keyByte))
+            {
+                byte[] hashMessage = hmacsha256.ComputeHash(messageBytes);
+                var hexString = BitConverter.ToString(hashMessage);
+                hash = hexString.Replace("-", "");
+            }
+
+            return hash;
+        }
+
+        private void SetEnvironmentVariables(string key, string secret)
+        {
+            Environment.SetEnvironmentVariable(KeyName, key);
+            Environment.SetEnvironmentVariable(SecretName, secret);
+        }
+
+        private void DeleteEnvironmentVariables()
+        {
+            Environment.SetEnvironmentVariable(KeyName, string.Empty);
+            Environment.SetEnvironmentVariable(SecretName, string.Empty);
+        }
+
+        private void SetAppSettings(string key, string secret)
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            if (ConfigurationManager.AppSettings.AllKeys.Contains(KeyName))
+            {
+                config.AppSettings.Settings[KeyName].Value = key;
+            }
+            else
+            {
+                config.AppSettings.Settings.Add(KeyName, key);
+            }
+
+            if (ConfigurationManager.AppSettings.AllKeys.Contains(SecretName))
+            {
+                config.AppSettings.Settings[SecretName].Value = secret;
+            }
+            else
+            {
+                config.AppSettings.Settings.Add(SecretName, secret);
+            }
+
+            config.Save(ConfigurationSaveMode.Modified, true);
+
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
+        private void RemoveAppSettings()
+        {
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            if (ConfigurationManager.AppSettings.AllKeys.Contains(KeyName))
+            {
+                config.AppSettings.Settings.Remove(KeyName);
+            }
+
+            if (ConfigurationManager.AppSettings.AllKeys.Contains(SecretName))
+            {
+                config.AppSettings.Settings.Remove(SecretName);
+            }
+
+            config.Save(ConfigurationSaveMode.Modified, true);
+
+            ConfigurationManager.RefreshSection("appSettings");
         }
     }
 }

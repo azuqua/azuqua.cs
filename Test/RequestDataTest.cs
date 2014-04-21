@@ -15,6 +15,7 @@ namespace Azuqua.Test
     [TestFixture]
     public class RequestDataTest
     {
+        private const string ServerUrlName = "floServerUrl";
         private const string KeyName = "floAccessKey";
         private const string SecretName = "floAccessSecret";
 
@@ -160,12 +161,14 @@ namespace Azuqua.Test
 
         private void SetEnvironmentVariables(string key, string secret)
         {
+            Environment.SetEnvironmentVariable(ServerUrlName, "http://test.url");
             Environment.SetEnvironmentVariable(KeyName, key);
             Environment.SetEnvironmentVariable(SecretName, secret);
         }
 
         private void DeleteEnvironmentVariables()
         {
+            Environment.SetEnvironmentVariable(ServerUrlName, string.Empty);
             Environment.SetEnvironmentVariable(KeyName, string.Empty);
             Environment.SetEnvironmentVariable(SecretName, string.Empty);
         }
@@ -173,6 +176,15 @@ namespace Azuqua.Test
         private void SetAppSettings(string key, string secret)
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            if (ConfigurationManager.AppSettings.AllKeys.Contains(ServerUrlName))
+            {
+                config.AppSettings.Settings[ServerUrlName].Value = "http://test.url";
+            }
+            else
+            {
+                config.AppSettings.Settings.Add(ServerUrlName, "http://test.url");
+            }
 
             if (ConfigurationManager.AppSettings.AllKeys.Contains(KeyName))
             {
@@ -200,6 +212,11 @@ namespace Azuqua.Test
         private void RemoveAppSettings()
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            if (ConfigurationManager.AppSettings.AllKeys.Contains(ServerUrlName))
+            {
+                config.AppSettings.Settings.Remove(ServerUrlName);
+            }
 
             if (ConfigurationManager.AppSettings.AllKeys.Contains(KeyName))
             {

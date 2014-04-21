@@ -16,33 +16,37 @@ namespace Azuqua.Test
     [TestFixture]
     public class ConfigReaderTests
     {
+        private const string ServerUrlName = "floServerUrl";
         private const string KeyName = "floAccessKey";
         private const string SecretName = "floAccessSecret";
 
         #region Have only environment variables
 
         [Test]
-        public void ShouldReturnEmptyKeyAndSecretIfEnvironmentVariablesAreMissing()
+        public void ShouldReturnEmptyValuesIfEnvironmentVariablesAreMissing()
         {
             this.RemoveAppSettings();
 
             ConfigReader reader = new ConfigReader();
 
+            Assert.IsTrue(string.IsNullOrEmpty(reader.ServerUrl));
             Assert.IsTrue(String.IsNullOrEmpty(reader.Key));
             Assert.IsTrue(String.IsNullOrEmpty(reader.Secret));
         }
 
         [Test]
-        public void ShouldReturnCorrectKeyAndSecretFromEnvironmentVariables()
+        public void ShouldReturnCorrectValuesFromEnvironmentVariables()
         {
+            string server = "http://test.url";
             string key = "aaaaa";
             string secret = "bbbbb";
 
             this.RemoveAppSettings();
-            this.SetEnvironmentVariables(key, secret);
+            this.SetEnvironmentVariables(server, key, secret);
 
             ConfigReader reader = new ConfigReader();
 
+            Assert.AreEqual(server, reader.ServerUrl);
             Assert.AreEqual(key, reader.Key);
             Assert.AreEqual(secret, reader.Secret);
 
@@ -54,30 +58,33 @@ namespace Azuqua.Test
         #region Have only configuration file
 
         [Test]
-        public void ShouldReturnEmptyKeyAndSecretIfConfigSettingsAreMissing()
+        public void ShouldReturnEmptyValuesIfConfigSettingsAreMissing()
         {
             this.RemoveAppSettings();
             this.DeleteEnvironmentVariables();
 
             ConfigReader reader = new ConfigReader();
 
+            Assert.IsTrue(String.IsNullOrEmpty(reader.ServerUrl));
             Assert.IsTrue(String.IsNullOrEmpty(reader.Key));
             Assert.IsTrue(String.IsNullOrEmpty(reader.Secret));
         }
 
         [Test]
-        public void ShouldReturnCorrectKeyAndSecretFromConfigurationFile()
+        public void ShouldReturnCorrectValuesFromConfigurationFile()
         {
+            string server = "http://test.url";
             string key = "aaaaa";
             string secret = "bbbbb";
 
             this.DeleteEnvironmentVariables();
-            this.SetAppSettings(key, secret);
+            this.SetAppSettings(server, key, secret);
 
             ConfigReader reader = new ConfigReader();
 
             Assert.NotNull(ConfigurationManager.AppSettings);
 
+            Assert.AreEqual(server, reader.ServerUrl);
             Assert.AreEqual(key, reader.Key);
             Assert.AreEqual(secret, reader.Secret);
 
@@ -85,16 +92,18 @@ namespace Azuqua.Test
         }
 
         [Test]
-        public void ShouldNotUseKeyAndSecretIfOneOfTheConfigSettingsIsMissingOrEmpty()
+        public void ShouldNotUseValuesIfOneOfTheConfigSettingsIsMissingOrEmpty()
         {
+            string serverUrl = string.Empty;
             string key = "aaaaa";
             string secret = "";
 
             this.DeleteEnvironmentVariables();
-            this.SetAppSettings(key, secret);
+            this.SetAppSettings(serverUrl, key, secret);
 
             ConfigReader reader = new ConfigReader();
 
+            Assert.AreEqual(string.Empty, reader.ServerUrl);
             Assert.AreEqual(string.Empty, reader.Key);
             Assert.AreEqual(string.Empty, reader.Secret);
 
@@ -106,18 +115,22 @@ namespace Azuqua.Test
         #region Have both environment variables and configuration file
 
         [Test]
-        public void ShouldReturnKeyAndSecretFromConfigurationFileWhenEnvironmentVariablesAreAlsoExist()
+        public void ShouldReturnValuesFromConfigurationFileWhenEnvironmentVariablesAreAlsoExist()
         {
+            string server = "http://test.url";
             string key = "aaaaa";
             string secret = "bbbbb";
+
+            string server2 = "http://test2.url";
             string key2 = "ccccc";
             string secret2 = "ddddd";
 
-            this.SetAppSettings(key, secret);
-            this.SetEnvironmentVariables(key2, secret2);
+            this.SetAppSettings(server, key, secret);
+            this.SetEnvironmentVariables(server2, key2, secret2);
 
             ConfigReader reader = new ConfigReader();
 
+            Assert.AreEqual(server, reader.ServerUrl);
             Assert.AreEqual(key, reader.Key);
             Assert.AreEqual(secret, reader.Secret);
 
@@ -129,21 +142,32 @@ namespace Azuqua.Test
 
         #region Private methods
 
-        private void SetEnvironmentVariables(string key, string secret)
+        private void SetEnvironmentVariables(string serverUrl, string key, string secret)
         {
+            Environment.SetEnvironmentVariable(ServerUrlName, serverUrl);
             Environment.SetEnvironmentVariable(KeyName, key);
             Environment.SetEnvironmentVariable(SecretName, secret);
         }
         
         private void DeleteEnvironmentVariables()
         {
+            Environment.SetEnvironmentVariable(ServerUrlName, string.Empty);
             Environment.SetEnvironmentVariable(KeyName, string.Empty);
             Environment.SetEnvironmentVariable(SecretName, string.Empty);
         }
 
-        private void SetAppSettings(string key, string secret)
+        private void SetAppSettings(string serverUrl, string key, string secret)
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            if (ConfigurationManager.AppSettings.AllKeys.Contains(ServerUrlName))
+            {
+                config.AppSettings.Settings[ServerUrlName].Value = serverUrl;
+            }
+            else
+            {
+                config.AppSettings.Settings.Add(ServerUrlName, serverUrl);
+            }
 
             if (ConfigurationManager.AppSettings.AllKeys.Contains(KeyName))
             {
@@ -171,6 +195,11 @@ namespace Azuqua.Test
         private void RemoveAppSettings()
         {
             Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+            if (ConfigurationManager.AppSettings.AllKeys.Contains(ServerUrlName))
+            {
+                config.AppSettings.Settings.Remove(ServerUrlName);
+            }
 
             if (ConfigurationManager.AppSettings.AllKeys.Contains(KeyName))
             {

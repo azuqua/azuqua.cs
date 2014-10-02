@@ -16,17 +16,13 @@ namespace Azuqua.Test
     public class RequestDataTest
     {
         private const string ServerUrlName = "floServerUrl";
-        private const string KeyName = "floAccessKey";
-        private const string SecretName = "floAccessSecret";
 
         [Test]
-        public void CanCreateWithData()
+        public void CanCreateWithKeyAndSecret()
         {
-            string data = "";
+            Azuqua azu = new Azuqua("key", "secret");
 
-            RequestData requestData = new RequestData(data);
-
-            Assert.IsNotNull(requestData);
+            Assert.IsNotNull(azu);
         }
 
         [Test]
@@ -36,7 +32,7 @@ namespace Azuqua.Test
             string secret = "bbbbb";
             string data = "";
 
-            RequestData requestData = new RequestData(key, secret, data);
+            private const Azuqua azu = new Azuqua("key", "secret");
 
             Assert.IsNotNull(data);
         }

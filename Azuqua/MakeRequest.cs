@@ -9,12 +9,21 @@ using System.Security.Cryptography;
 
 /// This class encapsulates all necessary data that need to make
 /// a request to Flo's API
-public class Azuqua {
+public class MainTest {
+    // TODO: TESTING ONLY (Lito)
+    static void Main(string[] args) {
+            // Display the number of command line arguments:
+            Azuqua azu = new Azuqua("key", "secret");
+            string timestamp = DateTime.UtcNow.ToString("s"); // ISO formatted date
+            string hash = azu.SignData("/account/flos", "get", "Hello World", timestamp);
+            System.Console.WriteLine(hash);
+        }
+}
+// ???
+// How the heck do we match the time so exactly to unhash?
 
-    /// TODO(Lito): Configuration settings reader
-    private string ROUTES_list_path = "/account/flos";
-    private string ROUTES_list_method = "get";
-    private string ROUTES_invoke_path = "/flo/:id/invoke";
+
+public class Azuqua {
 
     private string accessKey, accessSecret;
     /// Constructor
@@ -24,20 +33,35 @@ public class Azuqua {
     }
 
     public void MakeRequest(string path, string verb, string data) {
+        verb = verb.ToUpper();
         if (data.Length < 1) {
             data = "";
         }
-        Dictionary<string, string> headers = HTTP_headers;
+        //Dictionary<string, string> headers = HTTP_headers;
         string timestamp = DateTime.UtcNow.ToString("s"); // ISO formatted date
 
-        HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://dcrypt.it/decrypt/paste"); 
-        //TODO: fixme
-        string hash = this.SignData(data, verb, path, timestamp);
+        byte[] hash = this.SignData(path, verb, data, timestamp);
 
-        if (verb == "get") {
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(""); 
+        request.Method = verb;
+        request.ContentLength = hash.Length;
+        request.ContentType = ; //TODO
+        // Let's take a second to appricate how cool the idea of streams is
+        Stream requestStream = request.GetRequestStream();
+        dataStream.Write(hash, 0, hash.Length);
+
+        // Make it happen!
+        // TODO: In the ifs
+        HttpWebRequest response = request.GetResponse();
+
+        // string jsonBody = "{\"x-api-accessKey\": 
+
+        host = "https://api.azuqua.com"
+        if (verb == "GET") {
+            string address = "/account/flos";
 
         }
-        else if (verb == "put") {
+        else if (verb == "PUT") {
 
         }
     }

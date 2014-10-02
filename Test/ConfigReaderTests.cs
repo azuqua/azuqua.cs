@@ -82,7 +82,7 @@ namespace Azuqua.Test
 
             ConfigReader reader = new ConfigReader();
 
-            Assert.NotNull(ConfigurationManager.AppSettings);
+            Assert.IsNotNull(ConfigurationManager.AppSettings);
 
             Assert.AreEqual(server, reader.ServerUrl);
             Assert.AreEqual(key, reader.Key);

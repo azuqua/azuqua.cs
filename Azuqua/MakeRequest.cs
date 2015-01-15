@@ -14,7 +14,7 @@ namespace Azuqua
 {
 /// This class encapsulates all necessary data that's needed to make
 /// a request to the Flo API
-    public class Azuqua 
+    public sealed class Azuqua 
     {
         private string accessKey, accessSecret;
 
@@ -37,7 +37,7 @@ namespace Azuqua
             }
         }
 
-        public string InvokeFlo(string name, string alias, string data) {
+        public string InvokeFlo(string alias, string data) {
             string path = "/flo/"+alias+"/invoke";
             string resp = this.MakeRequest(path, "POST", data);
             return resp;

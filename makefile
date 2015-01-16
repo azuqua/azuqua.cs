@@ -4,4 +4,4 @@ all:
 
 .PHONY: test
 test:
-	cd Test && mcs AzuquaTest.cs
+	cd Test && mcs AzuquaTest.cs && mono AzuquaTest.exe

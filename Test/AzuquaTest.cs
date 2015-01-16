@@ -51,5 +51,21 @@ namespace Azuqua.Test
 
             AssertEqual(signed, precomputed);
         }
+
+        [Test]
+        public void CanInvokeFlo() 
+        {
+            Azuqua azu = new Azuqua(KEY, SECRET);
+            string r = azu.InvokeFlo("httptohttp", "hello world");
+            Assert.NotNull(r);
+        }
+
+        [Test]
+        public void CanInvokeFloWithAlias() 
+        {
+            Azuqua azu = new Azuqua(KEY, SECRET);
+            string r = azu.InvokeFlo("3f8ca2b96024cae4cdacf652b6a322");
+            Assert.NotNull(r);
+        }
     }
 }

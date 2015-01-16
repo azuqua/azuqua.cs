@@ -25,15 +25,15 @@ namespace Azuqua
         }
 
         public void InitFromEnvironmentVariables() {
-            if (!string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(FloAccessKeyVariableName))
-                    && !string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable(FloAccessSecretVariableName)))
+            if (!string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable("floAccessKey"))
+                    && !string.IsNullOrEmpty(System.Environment.GetEnvironmentVariable("floAccessSecret")))
             {
-                this.accessKey = System.Environment.GetEnvironmentVariable(FloAccessKeyVariableName);
-                this.accessSecret = System.Environment.GetEnvironmentVariable(FloAccessSecretVariableName);
+                this.accessKey = System.Environment.GetEnvironmentVariable("floAccessKey");
+                this.accessSecret = System.Environment.GetEnvironmentVariable("floAccessKey");
             }
             else
             {
-                throw new Exception("Missing floAccessKey or FloAccessSecret environment variable");
+                throw new Exception("Missing floAccessKey or floAccessSecret environment variable");
             }
         }
 
@@ -43,7 +43,7 @@ namespace Azuqua
             return resp;
         }
 
-        private string MakeRequest(string path, string verb, string data) {
+        public string MakeRequest(string path, string verb, string data) {
             if (data.Length < 1) {
                 data = "";
             }
@@ -92,7 +92,7 @@ namespace Azuqua
 
         /// Generate Hash-based Message Authentication Code (HMAC) with 
         /// SHA256 and secret key
-        private string SignData(string path, string verb, string data, string timestamp) {
+        public string SignData(string path, string verb, string data, string timestamp) {
             if (string.IsNullOrEmpty(data)) {
                 return "";
             }

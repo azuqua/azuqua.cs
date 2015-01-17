@@ -348,6 +348,7 @@
         <member name="M:NUnit.Framework.Assert.Throws``1(NUnit.Framework.TestDelegate,System.String,System.Object[])">
             <summary>
             Verifies that a delegate throws a particular exception when called.
+    "{{title : string -> html}}
             </summary>
             <typeparam name="T">Type of the expected exception</typeparam>
             <param name="code">A TestDelegate</param>

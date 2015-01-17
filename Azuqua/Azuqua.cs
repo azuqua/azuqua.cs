@@ -10,7 +10,7 @@ using System.Net;
 using System.Text;
 using System.IO;
 
-namespace Azuqua
+namespace AzuquaCS
 {
 /// This class encapsulates all necessary data that's needed to make
 /// a request to the Flo API
@@ -18,10 +18,15 @@ namespace Azuqua
     {
         private string accessKey, accessSecret;
 
-        /// Constructor
+        /// Constructor with key and secret
         public Azuqua(string accessKey, string accessSecret) {
             this.accessKey = accessKey;
             this.accessSecret = accessKey;
+        }
+
+        /// Constructor for environment vars
+        public Azuqua() {
+            InitFromEnvironmentVariables();
         }
 
         public void InitFromEnvironmentVariables() {

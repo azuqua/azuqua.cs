@@ -6,11 +6,11 @@ using System.Text;
 using NUnit;
 using NUnit.Framework;
 
-using Azuqua;
+using Azuqua = AzuquaCS.Azuqua;
 using System.Security.Cryptography;
 using System.Configuration;
 
-namespace Azuqua.Test
+namespace AzuquaCS.Test
 {
     [TestFixture]
     public class AzuquaTest
@@ -21,10 +21,7 @@ namespace Azuqua.Test
         [Test]
         public void CanCreateWithKeyAndSecret()
         {
-            string key = "aaaaa";
-            string secret = "bbbbb";
-
-            const Azuqua azu = new Azuqua("key", "secret");
+            var azu = new Azuqua("key", "secret");
         }
 
         [Test]
@@ -43,13 +40,13 @@ namespace Azuqua.Test
         }
 
         [Test]
-        public void CanSignData() 
+        public void CanSignData()
         {
             Azuqua azu = new Azuqua("aaa", "bbb");
             string signed = azu.SignData("path", "GET", "hello world", "timestamp");
             string precomputed = "c59d6859a39323a4c96facbffe6ba217defd1674825ac713bad611c9ca23e15e"; 
 
-            AssertEqual(signed, precomputed);
+            Assert.Equals(signed, precomputed);
         }
 
         [Test]

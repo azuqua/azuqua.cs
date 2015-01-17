@@ -61,7 +61,7 @@ namespace AzuquaCS.Test
         public void CanInvokeFloWithAlias() 
         {
             Azuqua azu = new Azuqua(KEY, SECRET);
-            string r = azu.InvokeFlo("3f8ca2b96024cae4cdacf652b6a322");
+            string r = azu.InvokeFlo("3f8ca2b96024cae4cdacf652b6a322", "hello world");
             Assert.NotNull(r);
         }
     }

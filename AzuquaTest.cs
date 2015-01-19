@@ -28,6 +28,8 @@ namespace AzuquaCS.Test
         [ExpectedException(typeof(Exception))]
         public void FailIfNoEnvVarsAndNoKeys()
         {
+            Environment.SetEnvironmentVariable("floAccessKey", "");
+            Environment.SetEnvironmentVariable("floAccessSecret", "");
             Azuqua azu = new Azuqua(); // Try without env vars set
         }
 
@@ -42,9 +44,9 @@ namespace AzuquaCS.Test
         [Test]
         public void CanSignData()
         {
-            Azuqua azu = new Azuqua("aaa", "bbb");
-            string signed = azu.SignData("path", "GET", "hello world", "timestamp");
-            string precomputed = "c59d6859a39323a4c96facbffe6ba217defd1674825ac713bad611c9ca23e15e"; 
+            Azuqua azu = new Azuqua("key", "secret");
+            string signed = azu.SignData("data", "verb", "path", "timestamp");
+            string precomputed = "08f14586918357376921c8714eec042b4f1bc64650bed212c2d5ff665dc97515"; 
 
             Assert.AreEqual(signed, precomputed);
         }

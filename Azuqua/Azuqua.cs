@@ -21,7 +21,7 @@ namespace AzuquaCS
         /// Constructor with key and secret
         public Azuqua(string accessKey, string accessSecret) {
             this.accessKey = accessKey;
-            this.accessSecret = accessKey;
+            this.accessSecret = accessSecret;
         }
 
         /// Constructor for environment vars
@@ -56,7 +56,7 @@ namespace AzuquaCS
             }
             //TODO: DOUBLE CHECK TIMESTAMP
             string timestamp = DateTime.UtcNow.ToString("s"); // ISO formatted date
-            string hash = this.SignData(path, verb, data, timestamp);
+            string hash = this.SignData(data, verb, path, timestamp);
 
             verb = verb.ToUpper();
             string host = "https://api.azuqua.com";
@@ -99,22 +99,22 @@ namespace AzuquaCS
 
         /// Generate Hash-based Message Authentication Code (HMAC) with 
         /// SHA256 and secret key
-        public string SignData(string path, string verb, string data, string timestamp) {
+        public string SignData(string data, string verb, string path, string timestamp) {
             if (string.IsNullOrEmpty(data)) {
-                return "";
+                data = "";
             }
 
             string meta = verb.ToLower()+":"+path+":"+timestamp;
 
             var encoding = new System.Text.UTF8Encoding();
             byte[] keyByte = encoding.GetBytes(this.accessSecret);
-            byte[] messageBytes = encoding.GetBytes(data+meta);
+            byte[] messageBytes = encoding.GetBytes(meta+data);
 
             using (var hmacsha256 = new HMACSHA256(keyByte)) {
                 byte[] hashMessage = hmacsha256.ComputeHash(messageBytes);
                 var hexString = BitConverter.ToString(hashMessage);
                 // By default, BitConverter's output is '-' separated hex pairs
-                return hexString.Replace("-", "");
+                return hexString.Replace("-", "").ToLower();
             }
         }
     }

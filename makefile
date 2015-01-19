@@ -1,7 +1,10 @@
 # For building on unix
 all:
-	cd Azuqua && mcs -target:library -out:Azuqua.dll Azuqua.cs
+	mcs -target:library -out:Azuqua.dll Azuqua/Azuqua.cs
+
+buildtest: all
+	mcs Test/AzuquaTest.cs -r:Azuqua.dll,nunit.framework.dll -target:library
 
 .PHONY: test
-test: all
-	cd Test && mcs AzuquaTest.cs -r:../Azuqua/Azuqua.dll -r:nunit.framework.dll -target:library
+test: buildtest
+	cd Test && nunit-console AzuquaTest.dll

@@ -46,7 +46,7 @@ namespace AzuquaCS.Test
             string signed = azu.SignData("path", "GET", "hello world", "timestamp");
             string precomputed = "c59d6859a39323a4c96facbffe6ba217defd1674825ac713bad611c9ca23e15e"; 
 
-            Assert.Equals(signed, precomputed);
+            Assert.AreEqual(signed, precomputed);
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace AzuquaCS.Test
         {
             Azuqua azu = new Azuqua(KEY, SECRET);
             string r = azu.InvokeFlo("httptohttp", "hello world");
-            Assert.NotNull(r);
+            Assert.IsNotNull(r);
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace AzuquaCS.Test
         {
             Azuqua azu = new Azuqua(KEY, SECRET);
             string r = azu.InvokeFlo("3f8ca2b96024cae4cdacf652b6a322", "hello world");
-            Assert.NotNull(r);
+            Assert.IsNotNull(r);
         }
     }
 }

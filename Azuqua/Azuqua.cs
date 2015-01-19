@@ -39,14 +39,12 @@ namespace AzuquaCS
             else
             {
                 throw new Exception("Missing floAccessKey or floAccessSecret environment variable");
-                Console.WriteLine(this.accessKey);
-                Console.WriteLine(this.accessSecret);
             }
         }
 
         public string InvokeFlo(string alias, string data) {
             string path = "/flo/"+alias+"/invoke";
-            string resp = this.MakeRequest(path, "POST", data);
+            string resp = this.MakeRequest(path, "GET", data);
             return resp;
         }
 
@@ -60,7 +58,8 @@ namespace AzuquaCS
 
             verb = verb.ToUpper();
             string host = "https://api.azuqua.com";
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(host+path);
+            string uri = host + path;
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.Method = verb;
             request.ContentType = "application/json";
             request.Headers.Add("x-api-accessKey", this.accessKey);
@@ -69,6 +68,7 @@ namespace AzuquaCS
 
             // Make it happen! 
             if (verb == "GET") {
+                request.ContentLength = 0;
                 WebResponse response = request.GetResponse();
                 Stream responseStream = response.GetResponseStream();
                 using (var streamReader = new StreamReader(responseStream)) {
@@ -83,7 +83,7 @@ namespace AzuquaCS
                 requestStream.Write(dataBytes, 0, dataBytes.Length);
 
                 // .GetResponse both sends to the server and gets the response
-                WebResponse response = request.GetResponse();
+                WebResponse response = (HttpWebResponse)request.GetResponse();
                 Stream responseStream = response.GetResponseStream();
                 using (var streamReader = new StreamReader(responseStream)) {
                     string responseText = streamReader.ReadToEnd();

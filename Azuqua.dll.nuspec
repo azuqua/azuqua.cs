@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+  <metadata>
+    <id>Azuqua.dll</id>
+    <version>1.0.0</version>
+    <authors>Azuqua, Inc.</authors>
+    <owners>Azuqua, Inc.</owners>
+    <licenseUrl>http://github.com/azuqua/azuqua.cs/blob/master/LICENSE</licenseUrl>
+    <projectUrl>http://https://github.com/azuqua/azuqua.cs</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Azuqua C# Client</description>
+    <releaseNotes>Initial release of C# Azuqua Client</releaseNotes>
+    <copyright>Copyright 2015</copyright>
+    <dependencies>
+    </dependencies>
+  </metadata>
+  <files>
+      <file src="./Azuqua.dll" />
+  </files>
+</package>

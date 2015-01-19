@@ -52,19 +52,22 @@ namespace AzuquaCS.Test
         }
 
         [Test]
-        public void CanInvokeFlo() 
+        [ExpectedException(typeof(System.Net.WebException))]
+        public void CanHitFloEndpoint() 
         {
             Azuqua azu = new Azuqua(KEY, SECRET);
-            string r = azu.InvokeFlo("httptohttp", "hello world");
+            string r = azu.InvokeFlo("invalidalias", "hello world");
+            Console.WriteLine(r);
             Assert.IsNotNull(r);
         }
 
         [Test]
         public void CanInvokeFloWithAlias() 
         {
-            Azuqua azu = new Azuqua(KEY, SECRET);
-            string r = azu.InvokeFlo("3f8ca2b96024cae4cdacf652b6a322", "hello world");
+            Azuqua azu = new Azuqua("", "");
+            string r = azu.InvokeFlo("02d863f0299073f3e1c461874a981e", "hello world");
             Assert.IsNotNull(r);
+            Assert.AreEqual(r, "{\"data\":{}}");
         }
     }
 }

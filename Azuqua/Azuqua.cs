@@ -39,6 +39,8 @@ namespace AzuquaCS
             else
             {
                 throw new Exception("Missing floAccessKey or floAccessSecret environment variable");
+                Console.WriteLine(this.accessKey);
+                Console.WriteLine(this.accessSecret);
             }
         }
 

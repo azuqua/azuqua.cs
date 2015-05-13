@@ -15,59 +15,55 @@ namespace AzuquaCS.Test
     [TestFixture]
     public class AzuquaTest
     {
-        const string SECRET = "5686f7797cd31e366608b08fb9460a9926facacd876bb5f70cf872083a34f2cb";
-        const string KEY = "d9da0ea5efb58b22545f909e7754235bb9e7fad5";
+        //const string SECRET = "5686f7797cd31e366608b08fb9460a9926facacd876bb5f70cf872083a34f2cb";
+        //const string KEY = "d9da0ea5efb58b22545f909e7754235bb9e7fad5";
 
         [Test]
         public void CanCreateWithKeyAndSecret()
         {
-            var azu = new Azuqua("key", "secret");
-        }
-
-        [Test]
-        [ExpectedException(typeof(Exception))]
-        public void FailIfNoEnvVarsAndNoKeys()
-        {
-            Environment.SetEnvironmentVariable("floAccessKey", "");
-            Environment.SetEnvironmentVariable("floAccessSecret", "");
-            Azuqua azu = new Azuqua(); // Try without env vars set
-        }
-
-        [Test]
-        public void CanCreateWithEnvVars()
-        {
-            Environment.SetEnvironmentVariable("floAccessKey", KEY);
-            Environment.SetEnvironmentVariable("floAccessSecret", SECRET);
-            Azuqua azu = new Azuqua(); // Should be ok this time!
+            string KEY = Environment.GetEnvironmentVariable ("ACCESS_KEY");
+            string SECRET = Environment.GetEnvironmentVariable ("ACCESS_SECRET");
+            var org = new Org("Azuqua Org", KEY, SECRET);
         }
 
         [Test]
         public void CanSignData()
         {
-            Azuqua azu = new Azuqua("key", "secret");
-            string signed = azu.SignData("data", "verb", "path", "timestamp");
+            string signed = Azuqua.SignData("data", "verb", "path", "timestamp", "secret");
             string precomputed = "08f14586918357376921c8714eec042b4f1bc64650bed212c2d5ff665dc97515"; 
-
             Assert.AreEqual(signed, precomputed);
         }
 
         [Test]
-        [ExpectedException(typeof(System.Net.WebException))]
-        public void CanHitFloEndpoint() 
+        public void CanCreateOrgWithKeyAndSecret() 
         {
-            Azuqua azu = new Azuqua(KEY, SECRET);
-            string r = azu.InvokeFlo("invalidalias", "hello world");
-            Console.WriteLine(r);
-            Assert.IsNotNull(r);
+            string KEY = Environment.GetEnvironmentVariable ("ACCESS_KEY");
+            string SECRET = Environment.GetEnvironmentVariable ("ACCESS_SECRET");            
+            Org org = new Org("Azuqua Org Name", KEY, SECRET);
+            foreach (Flo flo in org.GetFlos()) {
+                // Call each flo method.
+                flo.Enable ();
+                var resp = flo.Invoke ("{\"a\":\"Test Data\"}");
+                Assert.IsNotNull(resp);
+                Assert.AreEqual(resp, "{\"data\":{\"a\":\"Test Data\"}}");
+            }
         }
 
         [Test]
         public void CanInvokeFloWithAlias() 
         {
-            Azuqua azu = new Azuqua("", "");
-            string r = azu.InvokeFlo("02d863f0299073f3e1c461874a981e", "hello world");
-            Assert.IsNotNull(r);
-            Assert.AreEqual(r, "{\"data\":{}}");
+            string EMAIL = Environment.GetEnvironmentVariable ("AZUQUA_EMAIL");
+            string PASSWORD = Environment.GetEnvironmentVariable ("AZUQUA_PASSWORD");
+
+            List<Org> orgs = Azuqua.Login (EMAIL, PASSWORD);
+            foreach (Org org in orgs) {
+                foreach (Flo flo in org.GetFlos()) {
+                    flo.Enable ();
+                    string resp = flo.Invoke ("{\"a\":\"Test Data\"}");
+                    Assert.IsNotNull(resp);
+                    Assert.AreEqual(resp, "{\"data\":{\"a\":\"Test Data\"}}");
+                }
+            }
         }
     }
 }

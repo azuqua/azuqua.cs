@@ -29,7 +29,7 @@ using Azuqua = AzuquaCS.Azuqua;
 public class MainClass {
 	public static void Main (string[] args)
 	{
-		// grab credentials, org key, and org secret from the environment variables
+		// grab credentials from the environment variables
 		string EMAIL = Environment.GetEnvironmentVariable ("AZUQUA_EMAIL");
 		string PASSWORD = Environment.GetEnvironmentVariable ("AZUQUA_PASSWORD");
 
@@ -95,10 +95,6 @@ using Azuqua = AzuquaCS.Azuqua;
 public class MainClass {
 	public static void Main (string[] args)
 	{
-		// grab org key, and org secret from the environment variables
-		string KEY = Environment.GetEnvironmentVariable ("ACCESS_KEY");
-		string SECRET = Environment.GetEnvironmentVariable ("ACCESS_SECRET");
-
 		// Create an org with a config JSON file
 		Org orgViaConfigFile = new Org("/tmp/config.json");	
 		foreach (Flo flo in org.GetFlos()) {
